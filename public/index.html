@@ -1,0 +1,905 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111315">
+  <meta name="description" content="Meet someone new on Geelom. Find a conversation around the things you love.">
+  <title>Geelom — meet someone new</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --page: #111315;
+      --surface: #191c1f;
+      --surface-raised: #202428;
+      --line: #30363a;
+      --text: #f1f3f4;
+      --muted: #929ba1;
+      --accent: #52d6d1;
+      --accent-strong: #32c6c1;
+      --coral: #ff7468;
+      --notice: #d3bd78;
+      --shadow: 0 24px 80px rgb(0 0 0 / 22%);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+
+    :root[data-theme="light"] {
+      color-scheme: light;
+      --page: #f4f5f3;
+      --surface: #fff;
+      --surface-raised: #f6f7f6;
+      --line: #dfe3e1;
+      --text: #202626;
+      --muted: #727d7b;
+      --accent: #087f82;
+      --accent-strong: #066e71;
+      --coral: #c34a41;
+      --notice: #8a7029;
+      --shadow: 0 24px 80px rgb(27 43 40 / 8%);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      background: var(--page);
+      color: var(--text);
+      transition: background-color 180ms ease, color 180ms ease;
+    }
+
+    button,
+    input {
+      color: inherit;
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    input:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    .site-header {
+      display: flex;
+      width: min(100% - 48px, 1120px);
+      height: 76px;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 auto;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      color: var(--text);
+      font-size: 20px;
+      font-weight: 650;
+      letter-spacing: -0.8px;
+      text-decoration: none;
+    }
+
+    .theme-toggle,
+    .quiet-button {
+      min-height: 38px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 13px;
+      transition: border-color 150ms ease, background-color 150ms ease;
+    }
+
+    .theme-toggle:hover,
+    .quiet-button:hover {
+      border-color: var(--muted);
+      background: var(--surface-raised);
+    }
+
+    main {
+      display: grid;
+      width: min(100% - 48px, 1120px);
+      flex: 1;
+      place-items: center;
+      margin: 0 auto;
+      padding: 48px 0 64px;
+    }
+
+    .landing {
+      width: min(100%, 520px);
+      padding: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 650;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 6vw, 42px);
+      font-weight: 570;
+      letter-spacing: -1.7px;
+      line-height: 1.12;
+    }
+
+    .intro {
+      max-width: 370px;
+      margin: 16px 0 30px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .interest-input,
+    .message-input {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--page);
+      color: var(--text);
+      transition: border-color 150ms ease;
+    }
+
+    .interest-input {
+      height: 48px;
+      padding: 0 13px;
+      font-size: 14px;
+    }
+
+    .interest-input::placeholder,
+    .message-input::placeholder {
+      color: var(--muted);
+      opacity: 0.8;
+    }
+
+    .interest-input:focus,
+    .message-input:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    .field-help {
+      margin: 9px 0 22px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .start-button,
+    .send-button {
+      display: inline-flex;
+      min-height: 46px;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-radius: 7px;
+      background: var(--accent-strong);
+      color: #071718;
+      font-size: 14px;
+      font-weight: 650;
+      transition: filter 150ms ease, transform 150ms ease;
+    }
+
+    .start-button {
+      width: 100%;
+    }
+
+    .start-button:hover,
+    .send-button:hover {
+      filter: brightness(1.08);
+    }
+
+    .start-button:active,
+    .send-button:active {
+      transform: translateY(1px);
+    }
+
+    .start-button:disabled,
+    .send-button:disabled {
+      cursor: not-allowed;
+      filter: saturate(0.35);
+      opacity: 0.65;
+    }
+
+    .search-status {
+      display: flex;
+      min-height: 24px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .search-status-text {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+
+    .status-dot.active {
+      background: var(--accent);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+    }
+
+    .status-counter {
+      color: var(--notice);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .chat-state {
+      display: none;
+      width: min(100%, 850px);
+      min-height: min(680px, calc(100vh - 180px));
+      flex-direction: column;
+      align-self: stretch;
+      margin: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .chat-state.visible {
+      display: flex;
+    }
+
+    .chat-toolbar {
+      display: flex;
+      min-height: 62px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .chat-presence {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .chat-presence .status-dot {
+      background: var(--notice);
+    }
+
+    .chat-presence.connected .status-dot {
+      background: var(--accent);
+    }
+
+    .search-counter {
+      color: var(--notice);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .chat-log {
+      display: flex;
+      min-height: 260px;
+      flex: 1;
+      flex-direction: column;
+      gap: 11px;
+      padding: 24px clamp(18px, 5vw, 42px) 118px;
+      overflow-y: auto;
+      overflow-wrap: anywhere;
+      scroll-behavior: smooth;
+    }
+
+    .chat-line {
+      margin: 0;
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .chat-line.system {
+      color: var(--notice);
+    }
+
+    .chat-line.stranger {
+      color: var(--coral);
+    }
+
+    .chat-line.you {
+      color: var(--accent);
+    }
+
+    .chat-line .line-label {
+      color: inherit;
+      opacity: 0.76;
+    }
+
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .typing-dots {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .typing-dots span {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: typing-bounce 1s ease-in-out infinite;
+    }
+
+    .typing-dots span:nth-child(2) {
+      animation-delay: 120ms;
+    }
+
+    .typing-dots span:nth-child(3) {
+      animation-delay: 240ms;
+    }
+
+    @keyframes typing-bounce {
+      0%, 60%, 100% {
+        opacity: 0.4;
+        transform: translateY(0);
+      }
+
+      30% {
+        opacity: 1;
+        transform: translateY(-3px);
+      }
+    }
+
+    .composer {
+      position: fixed;
+      z-index: 2;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: none;
+      padding: 14px max(24px, calc((100vw - 850px) / 2)) max(14px, env(safe-area-inset-bottom));
+      border-top: 1px solid var(--line);
+      background: color-mix(in srgb, var(--surface) 94%, transparent);
+      backdrop-filter: blur(14px);
+    }
+
+    .composer.visible {
+      display: block;
+    }
+
+    .composer-inner {
+      display: flex;
+      width: 100%;
+      max-width: 850px;
+      align-items: center;
+      gap: 10px;
+      margin: 0 auto;
+    }
+
+    .message-input {
+      height: 46px;
+      padding: 0 14px;
+      font-size: 14px;
+    }
+
+    .send-button {
+      min-width: 82px;
+      min-height: 46px;
+      padding: 0 16px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 600px) {
+      .site-header {
+        width: calc(100% - 32px);
+        height: 64px;
+      }
+
+      main {
+        width: calc(100% - 32px);
+        padding: 26px 0 36px;
+      }
+
+      .landing {
+        padding: 28px 22px;
+      }
+
+      .chat-state {
+        min-height: calc(100dvh - 108px);
+        border-radius: 7px;
+      }
+
+      .chat-toolbar {
+        min-height: 56px;
+        padding: 0 13px;
+      }
+
+      .chat-log {
+        padding: 18px 16px 102px;
+      }
+
+      .composer {
+        padding: 10px 12px max(10px, env(safe-area-inset-bottom));
+      }
+
+      .send-button {
+        min-width: 68px;
+        padding: 0 12px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="site-header">
+      <a class="brand" href="#" aria-label="Geelom home">Geelom</a>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false">Light mode</button>
+    </header>
+
+    <main>
+      <section class="landing" id="landing" aria-labelledby="page-title">
+        <p class="eyebrow">A good conversation starts anywhere</p>
+        <h2 id="page-title">No Ads, No Spam, No Bots</h2>
+        <p class="intro">Find a stranger, share a thought, and see where the conversation goes.</p>
+        <form id="search-form">
+          <label class="field-label" for="interest-input">Your interests</label>
+          <input
+            class="interest-input"
+            id="interest-input"
+            name="interests"
+            type="text"
+            maxlength="240"
+            placeholder="music, design, late-night talks"
+            autocomplete="off"
+          >
+          <p class="field-help">Add a few topics, separated by commas. We’ll look for someone nearby first.</p>
+          <button class="start-button" id="start-button" type="submit">Start chatting</button>
+        </form>
+        <div class="search-status" role="status" aria-live="polite">
+          <span class="search-status-text"><span class="status-dot" id="landing-dot"></span><span id="landing-status">Ready when you are</span></span>
+          <span class="status-counter" id="landing-counter"></span>
+        </div>
+      </section>
+
+      <section class="chat-state" id="chat-state" aria-label="Chat" aria-hidden="true">
+        <div class="chat-toolbar">
+          <div class="chat-presence" id="chat-presence" role="status" aria-live="polite">
+            <span class="status-dot"></span>
+            <span id="chat-status">Looking for someone nearby</span>
+          </div>
+          <span class="search-counter" id="search-counter">Local first · 01:00</span>
+          <button class="quiet-button" id="new-stop-button" type="button">New / Stop</button>
+        </div>
+        <div class="chat-log" id="chat-log" role="log" aria-live="polite" aria-relevant="additions text">
+          <div class="typing-indicator" id="typing-indicator" role="status" aria-label="Stranger is typing" hidden>
+            <span>Stranger is typing</span>
+            <span class="typing-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <form class="composer" id="message-form" aria-label="Send a message">
+    <div class="composer-inner">
+      <input class="message-input" id="message-input" type="text" maxlength="2000" placeholder="Write a message…" autocomplete="off" disabled>
+      <button class="send-button" id="send-button" type="submit" disabled>Send</button>
+    </div>
+  </form>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    (() => {
+      const landing = document.getElementById('landing');
+      const searchForm = document.getElementById('search-form');
+      const interestInput = document.getElementById('interest-input');
+      const startButton = document.getElementById('start-button');
+      const landingStatus = document.getElementById('landing-status');
+      const landingDot = document.getElementById('landing-dot');
+      const landingCounter = document.getElementById('landing-counter');
+      const chatState = document.getElementById('chat-state');
+      const chatLog = document.getElementById('chat-log');
+      const typingIndicator = document.getElementById('typing-indicator');
+      const chatPresence = document.getElementById('chat-presence');
+      const chatStatus = document.getElementById('chat-status');
+      const searchCounter = document.getElementById('search-counter');
+      const messageForm = document.getElementById('message-form');
+      const messageInput = document.getElementById('message-input');
+      const sendButton = document.getElementById('send-button');
+      const newStopButton = document.getElementById('new-stop-button');
+      const themeToggle = document.getElementById('theme-toggle');
+      const themeMeta = document.querySelector('meta[name="theme-color"]');
+
+      let socket = null;
+      let country = '';
+      let searchInterval = null;
+      let searchStartedAt = 0;
+      let searching = false;
+      let connected = false;
+      let typingTimeout = null;
+      let isTyping = false;
+
+      const savedTheme = localStorage.getItem('geelom-theme');
+      if (savedTheme === 'light') {
+        setTheme('light');
+      }
+
+      function setTheme(theme) {
+        const isLight = theme === 'light';
+        document.documentElement.dataset.theme = isLight ? 'light' : 'dark';
+        themeToggle.textContent = isLight ? 'Dark mode' : 'Light mode';
+        themeToggle.setAttribute('aria-pressed', String(isLight));
+        themeMeta.setAttribute('content', isLight ? '#f4f5f3' : '#111315');
+        localStorage.setItem('geelom-theme', isLight ? 'light' : 'dark');
+      }
+
+      themeToggle.addEventListener('click', () => {
+        setTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light');
+      });
+
+      function showChat() {
+        landing.hidden = true;
+        chatState.classList.add('visible');
+        chatState.setAttribute('aria-hidden', 'false');
+        messageForm.classList.add('visible');
+      }
+
+      function showLanding() {
+        landing.hidden = false;
+        chatState.classList.remove('visible');
+        chatState.setAttribute('aria-hidden', 'true');
+        messageForm.classList.remove('visible');
+      }
+
+      function addLine(kind, label, text) {
+        const line = document.createElement('p');
+        line.className = `chat-line ${kind}`;
+        if (label) {
+          const prefix = document.createElement('span');
+          prefix.className = 'line-label';
+          prefix.textContent = `${label}: `;
+          line.append(prefix);
+        }
+        line.append(document.createTextNode(text));
+        chatLog.append(line);
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+
+      function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const remainder = (seconds % 60).toString().padStart(2, '0');
+        return `${minutes}:${remainder}`;
+      }
+
+      function updateSearchClock() {
+        if (!searchStartedAt || !searching) {
+          return;
+        }
+        const elapsed = Math.floor((Date.now() - searchStartedAt) / 1000);
+        const remaining = Math.max(0, 60 - elapsed);
+        const indicator = remaining > 0
+          ? `Local first · 00:${remaining.toString().padStart(2, '0')}`
+          : `Expanding · ${formatTime(elapsed)}`;
+        searchCounter.textContent = indicator;
+        landingCounter.textContent = `${formatTime(elapsed)} · ${remaining > 0 ? `local first ${remaining}s` : 'global search'}`;
+      }
+
+      function startClock() {
+        clearInterval(searchInterval);
+        searchStartedAt = Date.now();
+        updateSearchClock();
+        searchInterval = setInterval(updateSearchClock, 1000);
+      }
+
+      function stopClock() {
+        clearInterval(searchInterval);
+        searchInterval = null;
+        searchStartedAt = 0;
+        landingCounter.textContent = '';
+      }
+
+      function hideTypingIndicator() {
+        typingIndicator.hidden = true;
+      }
+
+      function stopTyping() {
+        clearTimeout(typingTimeout);
+        typingTimeout = null;
+        if (isTyping && socket && socket.connected) {
+          socket.emit('stop-typing');
+        }
+        isTyping = false;
+      }
+
+      function setSearchingStatus(message) {
+        searching = true;
+        connected = false;
+        landingStatus.textContent = message;
+        landingDot.classList.add('active');
+        chatPresence.classList.remove('connected');
+        chatStatus.textContent = 'Looking for someone nearby';
+        messageInput.disabled = true;
+        sendButton.disabled = true;
+        startButton.disabled = true;
+        startButton.textContent = 'Searching…';
+        showChat();
+        startClock();
+      }
+
+      function beginSearch() {
+        if (!socket || !socket.connected) {
+          landingStatus.textContent = 'Connecting to Geelom…';
+          return;
+        }
+        searching = true;
+        connected = false;
+        socket.emit('start-search', { country, tags: getTags() });
+        setSearchingStatus('Looking for someone nearby');
+        addLine('system', '', 'Looking for someone nearby. We’ll widen the search after 60 seconds.');
+      }
+
+      function getTags() {
+        return interestInput.value
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter(Boolean)
+          .slice(0, 12);
+      }
+
+      async function getCountry() {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 4500);
+        try {
+          const response = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+          if (!response.ok) {
+            throw new Error(`Country lookup failed with status ${response.status}`);
+          }
+          const data = await response.json();
+          return typeof data.country_code === 'string' ? data.country_code.toUpperCase() : '';
+        } catch (error) {
+          console.warn('Geelom could not determine your country; continuing without it.', error);
+          return '';
+        } finally {
+          clearTimeout(timeout);
+        }
+      }
+
+      function connectAndSearch() {
+        if (typeof window.io !== 'function') {
+          landingStatus.textContent = 'Chat service is unavailable. Please try again later.';
+          startButton.disabled = false;
+          startButton.textContent = 'Start chatting';
+          return;
+        }
+
+        startButton.disabled = true;
+        startButton.textContent = 'Finding your region…';
+        landingStatus.textContent = 'Checking your region…';
+        socket = window.io();
+
+        socket.on('connect', async () => {
+          country = await getCountry();
+          if (!socket || !socket.connected || searching) {
+            return;
+          }
+          if (!country) {
+            addLine('system', '', 'Your region is unavailable. We’ll still find a match, expanding globally after 60 seconds.');
+          }
+          beginSearch();
+        });
+
+        socket.on('connect_error', (error) => {
+          console.error('Geelom connection failed.', error);
+          landingStatus.textContent = 'Could not connect. Check your connection and try again.';
+          startButton.disabled = false;
+          startButton.textContent = 'Start chatting';
+        });
+
+        socket.on('connected', (partner) => {
+          searching = false;
+          connected = true;
+          stopTyping();
+          hideTypingIndicator();
+          stopClock();
+          chatPresence.classList.add('connected');
+          chatStatus.textContent = 'You’re connected';
+          searchCounter.textContent = '';
+          messageInput.disabled = false;
+          sendButton.disabled = false;
+          messageInput.focus();
+          const sharedTags = partner && Array.isArray(partner.sharedTags) ? partner.sharedTags : [];
+          addLine('system', '', sharedTags.length
+            ? `You’re connected. You both like ${sharedTags.join(', ')}. Say hello.`
+            : 'You’re connected. Say hello.');
+        });
+
+        socket.on('chat-message', (payload) => {
+          const text = typeof payload === 'string' ? payload : payload && payload.message;
+          if (typeof text === 'string') {
+            addLine('stranger', 'Stranger', text);
+          }
+        });
+
+        socket.on('partner-typing', () => {
+          if (connected) {
+            chatLog.append(typingIndicator);
+            typingIndicator.hidden = false;
+            chatLog.scrollTop = chatLog.scrollHeight;
+          }
+        });
+
+        socket.on('partner-stop-typing', hideTypingIndicator);
+
+        socket.on('partner-disconnected', () => {
+          connected = false;
+          searching = false;
+          stopTyping();
+          hideTypingIndicator();
+          stopClock();
+          chatPresence.classList.remove('connected');
+          chatStatus.textContent = 'Stranger disconnected';
+          searchCounter.textContent = '';
+          messageInput.disabled = true;
+          sendButton.disabled = true;
+          addLine('system', '', 'Stranger disconnected. Choose New / Stop to find someone else.');
+        });
+
+        socket.on('disconnect', (reason) => {
+          connected = false;
+          searching = false;
+          stopTyping();
+          hideTypingIndicator();
+          stopClock();
+          messageInput.disabled = true;
+          sendButton.disabled = true;
+          chatPresence.classList.remove('connected');
+          if (reason !== 'io client disconnect') {
+            chatStatus.textContent = 'Connection lost';
+            addLine('system', '', 'Connection lost. Return to Geelom and try again.');
+          }
+          startButton.disabled = false;
+          startButton.textContent = 'Start chatting';
+        });
+      }
+
+      searchForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        chatLog.replaceChildren(typingIndicator);
+        hideTypingIndicator();
+        landingDot.classList.add('active');
+        if (socket && socket.connected) {
+          beginSearch();
+        } else {
+          connectAndSearch();
+        }
+      });
+
+      newStopButton.addEventListener('click', () => {
+        if (searching) {
+          hideTypingIndicator();
+          stopTyping();
+          if (socket) {
+            socket.disconnect();
+            socket = null;
+          }
+          searching = false;
+          stopClock();
+          landingDot.classList.remove('active');
+          landingStatus.textContent = 'Ready when you are';
+          startButton.disabled = false;
+          startButton.textContent = 'Start chatting';
+          showLanding();
+          return;
+        }
+
+        if (!socket || !socket.connected) {
+          showLanding();
+          return;
+        }
+
+        chatLog.replaceChildren(typingIndicator);
+        hideTypingIndicator();
+        stopTyping();
+        socket.emit('skip');
+        setSearchingStatus('Looking for someone new');
+        addLine('system', '', 'Looking for someone new. We’ll look nearby first.');
+      });
+
+      messageForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const message = messageInput.value.trim();
+        if (!message || !connected || !socket || !socket.connected) {
+          return;
+        }
+        stopTyping();
+        socket.emit('chat-message', { message });
+        addLine('you', 'You', message);
+        messageInput.value = '';
+        messageInput.focus();
+      });
+
+      messageInput.addEventListener('input', () => {
+        if (!connected || !socket || !socket.connected) {
+          return;
+        }
+
+        if (!messageInput.value.trim()) {
+          stopTyping();
+          return;
+        }
+
+        socket.emit('typing');
+        isTyping = true;
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(stopTyping, 1500);
+      });
+    })();
+  </script>
+</body>
+</html>
