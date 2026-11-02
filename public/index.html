@@ -576,6 +576,7 @@
       const themeToggle = document.getElementById('theme-toggle');
       const themeMeta = document.querySelector('meta[name="theme-color"]');
 
+      const backendUrl = 'https://geelom.ethiodeploy.app/';
       let socket = null;
       let country = '';
       let searchInterval = null;
@@ -741,9 +742,16 @@
         startButton.disabled = true;
         startButton.textContent = 'Finding your region…';
         landingStatus.textContent = 'Checking your region…';
-        socket = window.io();
+        socket = window.io(backendUrl, {
+          reconnection: true,
+          reconnectionAttempts: Infinity,
+          reconnectionDelay: 1000,
+          reconnectionDelayMax: 5000,
+          timeout: 10000,
+        });
 
         socket.on('connect', async () => {
+          chatStatus.textContent = 'Connected · finding a match';
           country = await getCountry();
           if (!socket || !socket.connected || searching) {
             return;
@@ -756,9 +764,14 @@
 
         socket.on('connect_error', (error) => {
           console.error('Geelom connection failed.', error);
-          landingStatus.textContent = 'Could not connect. Check your connection and try again.';
-          startButton.disabled = false;
-          startButton.textContent = 'Start chatting';
+          if (chatState.classList.contains('visible')) {
+            chatStatus.textContent = 'Connection interrupted · retrying…';
+            landingStatus.textContent = 'Reconnecting to Geelom…';
+          } else {
+            landingStatus.textContent = 'Connecting to Geelom…';
+          }
+          startButton.disabled = true;
+          startButton.textContent = 'Connecting…';
         });
 
         socket.on('connected', (partner) => {
@@ -819,12 +832,16 @@
           messageInput.disabled = true;
           sendButton.disabled = true;
           chatPresence.classList.remove('connected');
-          if (reason !== 'io client disconnect') {
-            chatStatus.textContent = 'Connection lost';
-            addLine('system', '', 'Connection lost. Return to Geelom and try again.');
+          if (reason === 'io client disconnect') {
+            startButton.disabled = false;
+            startButton.textContent = 'Start chatting';
+          } else {
+            chatStatus.textContent = 'Connection interrupted · retrying…';
+            landingStatus.textContent = 'Reconnecting to Geelom…';
+            if (chatState.classList.contains('visible')) {
+              addLine('system', '', 'Connection interrupted. Reconnecting to Geelom…');
+            }
           }
-          startButton.disabled = false;
-          startButton.textContent = 'Start chatting';
         });
       }
 
